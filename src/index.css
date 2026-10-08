@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    background-color: #f8fafc;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .font-display {
+    font-family: 'Chakra Petch', sans-serif;
+  }
+}
+
+.blueprint-grid {
+  background-image: 
+    linear-gradient(to right, rgba(2, 132, 199, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(2, 132, 199, 0.05) 1px, transparent 1px),
+    linear-gradient(to right, rgba(2, 132, 199, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(2, 132, 199, 0.12) 1px, transparent 1px);
+  background-size: 10px 10px, 10px 10px, 50px 50px, 50px 50px;
+}
+
+.blueprint-dots {
+  background-image: radial-gradient(rgba(14, 116, 144, 0.18) 1px, transparent 0);
+  background-size: 16px 16px;
+}
