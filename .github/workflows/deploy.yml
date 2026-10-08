@@ -1,0 +1,57 @@
+# Автоматична публікація проєкту на GitHub Pages.
+# Запускається при кожній зміні в гілці main.
+# - Якщо в репозиторії є package.json (застосунок з Google AI Studio, Vite) — проєкт збирається.
+# - Якщо package.json немає (звичайна HTML-сторінка, напр. з Gemini Canvas) — файли публікуються як є.
+name: Публікація на GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Збирання проєкту
+        run: |
+          if [ -f package.json ]; then
+            echo "Знайдено package.json — збираю застосунок через Vite"
+            # --legacy-peer-deps: експорти з AI Studio містять застарілу версію esbuild,
+            # яка конфліктує з Vite 8; без цього прапорця npm install завершується помилкою.
+            npm install --no-audit --no-fund --legacy-peer-deps
+            npx vite build --base "/${{ github.event.repository.name }}/" --outDir _site
+          else
+            echo "package.json немає — публікую файли як є"
+            mkdir -p _site
+            rsync -a --exclude '.git' --exclude '.github' --exclude '_site' --exclude 'README.md' ./ _site/
+          fi
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
